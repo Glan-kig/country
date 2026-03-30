@@ -9,3 +9,7 @@ Voici un aperçu de l'application :
 - Affichage d'une liste avec `LazyColumn`.
 - Manipulation de données avec une `Data Class`.
 - Design moderne avec `Jetpack Compose`.
+
+La mise a jour de l'application : 
+
+![Capture d'écran de l'application](capture2.png)

@@ -4,22 +4,20 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,9 +30,24 @@ import com.example.country.ui.theme.CountryTheme
 import com.example.country.model.Country
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Surface
-import androidx.compose.ui.platform.LocalLayoutDirection
-import com.example.country.data.CountrySource
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import com.example.country.data.DataSource.country
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,61 +61,178 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
 @Composable
-fun CountryApp(){
-    val layoutDirection = LocalLayoutDirection.current
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .padding(
-                start = WindowInsets.safeDrawing.asPaddingValues()
-                    .calculateStartPadding(layoutDirection),
-                end = WindowInsets.safeDrawing.asPaddingValues()
-                    .calculateEndPadding(layoutDirection),
-            ),
-    ) {
-        CountryList(
-            CountrySource().loadCountry()
+fun CountryIcon(
+    @DrawableRes countryIcon: Int,
+    modifier: Modifier = Modifier
+) {
+    Image(
+        painter = painterResource(countryIcon),
+        contentDescription = null,
+        modifier = modifier
+            .size(dimensionResource(R.dimen.image_size))
+            .padding(dimensionResource(R.dimen.padding_small))
+            .clip(CircleShape), // Rend l'image parfaitement ronde
+        contentScale = ContentScale.Crop // Recadre l'image pour remplir le cercle
+    )
+}
+
+
+
+@Composable
+fun CountryInformation(
+    @StringRes countryName: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(countryName),
+            style = MaterialTheme.typography.titleLarge, // Utilise la police Montserrat Bold
+            modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_small))
         )
     }
 }
 
 @Composable
-fun CountryItem(country: Country) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+private fun CountryItemButton(
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Image du drapeau à gauche
-            Image(
-                painter = painterResource(id = country.drapeauRes),
-                contentDescription = "Drapeau de ${country.nom}",
-                modifier = Modifier
-                    .size(60.dp)
-                    .padding(end = 16.dp)
-            )
+        Icon(
+            // Si c'est étendu, on montre la flèche vers le haut, sinon vers le bas
+            imageVector = if (expanded) Icons.Filled.KeyboardArrowDown else Icons.Filled.KeyboardArrowUp,
+            contentDescription = stringResource(R.string.expand_button_content_description),
+            tint = MaterialTheme.colorScheme.secondary // Utilise la couleur secondaire définie dans le thème
+        )
+    }
+}
 
-            // Texte à droite (Nom et Capitale)
-            Column {
-                Text(text = country.nom, style = MaterialTheme.typography.titleLarge)
-                Text(
-                    text = "Capitale : ${country.capitale}",
-                    style = MaterialTheme.typography.bodyMedium
+@Composable
+fun CountryHobby(
+    @StringRes countryCapital : Int,
+    @StringRes countryCode: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(R.string.about),
+            style = MaterialTheme.typography.labelSmall
+        )
+        Text(
+            text = "Capitale : " + stringResource(countryCapital),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = "Code : " + stringResource(countryCode),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CountryTopAppBar(modifier: Modifier = Modifier){
+    CenterAlignedTopAppBar(
+        title = {
+            Row() {
+                Image(
+                    modifier = Modifier
+                        .size(dimensionResource(id = R.dimen.image_size))
+                        .padding(dimensionResource(id = R.dimen.padding_small)),
+                    painter = painterResource(R.drawable.ic_launcher_foreground),
+                    contentDescription = null
                 )
-                Text(text = "Code : ${country.code}", style = MaterialTheme.typography.labelSmall)
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.displayLarge
+                )
+            }
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CountryApp() {
+    Scaffold(
+        topBar = {
+            CountryTopAppBar()
+        }
+    ) { it ->
+        LazyColumn(contentPadding = it) {
+            items(country) {
+                CountryItem(
+                    country = it,
+                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                )
             }
         }
     }
 }
+
+@Composable
+fun CountryItem(
+    country: Country,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier.padding(dimensionResource(R.dimen.padding_small))
+    ) {
+        // Nouvelle Column parente avec l'animation magique
+        Column(
+            modifier = Modifier
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
+        ) {
+            // Notre ligne principale (Image, Infos, Bouton)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.padding_small)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CountryIcon(countryIcon = country.drapeauRes)
+                CountryInformation(
+                    countryName = country.nom,
+                    modifier = Modifier.weight(1f)
+                )
+                CountryItemButton(
+                    expanded = expanded,
+                    onClick = { expanded = !expanded }
+                )
+            }
+
+            // Affichage conditionnel de la description
+            if (expanded) {
+                CountryHobby(
+                    countryCapital = country.capitale,
+                    countryCode = country.code,
+                    modifier = Modifier.padding(
+                        start = dimensionResource(R.dimen.padding_medium),
+                        top = dimensionResource(R.dimen.padding_small),
+                        end = dimensionResource(R.dimen.padding_medium),
+                        bottom = dimensionResource(R.dimen.padding_medium)
+                    )
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun CountryList(countries: List<Country>) {
@@ -127,12 +257,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    val fakeCountries = listOf(
-        Country("RDC", "Kinshasa", "CD", android.R.drawable.ic_menu_myplaces),
-        Country("France", "Paris", "FR", android.R.drawable.ic_menu_myplaces),
-        Country("espagne", "Madrid", "ES", android.R.drawable.ic_menu_compass)
-    )
     CountryTheme {
-        CountryList(countries = fakeCountries)
+        CountryApp()
     }
 }

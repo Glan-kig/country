@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">country</string>
+    <string name="country_name_1">RDC</string>
+    <string name="country_name_2">France</string>
+    <string name="country_name_3">Italie</string>
+    <string name="country_name_4">Chine</string>
+    <string name="country_name_5">Espagne</string>
+    <string name="country_name_6">Portugal</string>
+    <string name="country_name_7">Pologne</string>
+    <string name="country_name_8">Japon</string>
+    <string name="country_name_9">Maroc</string>
+    <string name="country_name_10">USA</string>
+
+    <string name="country_capital_1">Kinshsa</string>
+    <string name="country_capital_2">Paris</string>
+    <string name="country_capital_3">Rome</string>
+    <string name="country_capital_4">Pékin</string>
+    <string name="country_capital_5">Madrid</string>
+    <string name="country_capital_6">Lisbonne</string>
+    <string name="country_capital_7">Varsovie</string>
+    <string name="country_capital_8">Tokyo</string>
+    <string name="country_capital_9">Rabat</string>
+    <string name="country_capital_10">Washington D.C.</string>
+
+    <string name="about">À propos :</string>
+    <string name="country_code_1">+243</string>
+    <string name="country_code_2">+33</string>
+    <string name="country_code_3">+39</string>
+    <string name="country_code_4">+86</string>
+    <string name="country_code_5">+34</string>
+    <string name="country_code_6">+351</string>
+    <string name="country_code_7">+48</string>
+    <string name="country_code_8">+81</string>
+    <string name="country_code_9">+212</string>
+    <string name="country_code_10">+1</string>
+    <string name="expand_button_content_description">Voir plus ou moins d\'informations sur ce pays.</string>
 </resources>
