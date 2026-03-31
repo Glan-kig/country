@@ -10,11 +10,14 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
@@ -34,6 +37,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,6 +51,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.example.country.data.DataSource.country
 
 class MainActivity : ComponentActivity() {
@@ -142,7 +147,7 @@ fun CountryHobby(
 fun CountryTopAppBar(modifier: Modifier = Modifier){
     CenterAlignedTopAppBar(
         title = {
-            Row() {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     modifier = Modifier
                         .size(dimensionResource(id = R.dimen.image_size))
@@ -161,18 +166,47 @@ fun CountryTopAppBar(modifier: Modifier = Modifier){
 }
 
 @Composable
+fun HomeScreen(onExploreClicked: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Bienvenue dans l'application des pays !",
+            style = MaterialTheme.typography.displayMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onExploreClicked) {
+            Text(text = "Voir les pays")
+        }
+    }
+}
+
+@Composable
 fun CountryApp() {
+    var showCountryList by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             CountryTopAppBar()
         }
-    ) { it ->
-        LazyColumn(contentPadding = it) {
-            items(country) {
-                CountryItem(
-                    country = it,
-                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
-                )
+    ) { paddingValues ->
+        if (!showCountryList) {
+            HomeScreen(
+                onExploreClicked = { showCountryList = true },
+                modifier = Modifier.padding(paddingValues)
+            )
+        } else {
+            LazyColumn(contentPadding = paddingValues) {
+                items(country) {
+                    CountryItem(
+                        country = it,
+                        modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
+                    )
+                }
             }
         }
     }
