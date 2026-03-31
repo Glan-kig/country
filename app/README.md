@@ -14,6 +14,7 @@ La mise a jour de l'application :
 
 ![Capture d'écran de l'application](capture2.png)
 
+
 Ajout de la page d'accueil : 
 
 ![Capture d'écran de l'application](capture3.png)
